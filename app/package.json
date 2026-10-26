@@ -1,0 +1,40 @@
+{
+  "name": "study-planner",
+  "productName": "Study Planner",
+  "version": "1.0.0",
+  "description": "Study planner that imports tests from your Google Calendar",
+  "author": "Jaan Artur Pott",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.jaanartur.studyplanner",
+    "productName": "Study Planner",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "artifactName": "Study-Planner-Setup-${version}.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0"
+  }
+}
