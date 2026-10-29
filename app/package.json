@@ -1,7 +1,7 @@
 {
   "name": "study-planner",
   "productName": "Study Planner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Study planner that imports tests from your Google Calendar",
   "author": "Jaan Artur Pott",
   "private": true,
