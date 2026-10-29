@@ -17,7 +17,9 @@ const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')
 const today0 = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const daysUntil = s => Math.round((parse(s) - today0()) / 864e5);
-const byDate = (a, b) => parse(a.date) - parse(b.date);
+// Undated items (tasks can have no date) sort last
+const dateKey = s => s ? parse(s).getTime() : Infinity;
+const byDate = (a, b) => { const x = dateKey(a.date), y = dateKey(b.date); return x === y ? 0 : x - y; };
 const bool = v => v === true || String(v).toUpperCase() === 'TRUE';
 const fmt = s => s ? parse(s).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '—';
 const clock = d => d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -74,8 +76,8 @@ const findItem = (kind, id) => (kind === 'test' ? state.tests : state.plan).find
 const EDIT_FIELDS = { test: ['name', 'subject', 'date', 'description'], plan: ['date', 'task'] };
 
 function valid(kind, fields) {
-  if ((kind === 'test' ? fields.name : fields.task) && fields.date) return true;
-  toast(kind === 'test' ? 'A test needs a name and a date' : 'A task needs a date and a description');
+  if (kind === 'test' ? fields.name && fields.date : fields.task) return true;
+  toast(kind === 'test' ? 'A test needs a name and a date' : 'A task needs a description');
   return false;
 }
 
@@ -363,7 +365,7 @@ function testCard(t) {
       || '<li class="muted">No tasks yet — add one below.</li>'}
     </ul>
     <form class="add-form plan-form" data-test-id="${esc(t.id)}">
-      <input name="date" type="date" required aria-label="Task date" value="${esc(draft.date)}">
+      <input name="date" type="date" aria-label="Task date (optional)" title="Date (optional)" value="${esc(draft.date)}">
       <input name="task" placeholder="New study task" required aria-label="Task for ${esc(t.name)}" value="${esc(draft.task)}">
       <button type="submit" class="primary">Add task</button>
     </form>
@@ -394,7 +396,7 @@ function planItem(p) {
   const f = editFields('plan', p.id);
   if (f) return `
       <li><form class="add-form plan-form edit-form" data-kind="plan" data-id="${esc(p.id)}">
-        <input name="date" type="date" required aria-label="Task date" value="${esc(f.date)}">
+        <input name="date" type="date" aria-label="Task date (optional)" title="Date (optional)" value="${esc(f.date)}">
         <input name="task" placeholder="Study task" required aria-label="Task" value="${esc(f.task)}">
         ${editActions}
       </form></li>`;
